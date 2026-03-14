@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRO STREAM — Open Source Video Player</title>
+    <meta name="description" content="Open source video streaming player with Netlify Functions backend. Stream any video URL instantly.">
+    <meta name="keywords" content="video player, streaming, open source, netlify, web player">
+    <meta name="author" content="IRO Tech Lab">
+    <meta property="og:title" content="IRO STREAM — Open Source Video Player">
+    <meta property="og:description" content="High-performance video streaming with Netlify Functions backend">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Open Source License Meta -->
+    <meta name="license" content="MIT">
+    <link rel="license" href="https://opensource.org/licenses/MIT">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background Effects -->
+        <div class="bg-gradient"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-glow"></div>
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+                    <path d="M8 6L26 16L8 26V6Z" fill="url(#logoGrad)" stroke="currentColor" stroke-width="1.5"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="8" y1="6" x2="26" y2="26">
+                            <stop stop-color="#FF3366"/>
+                            <stop offset="1" stop-color="#0066FF"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">IRO STREAM</span>
+            </div>
+            
+            <div class="header-controls">
+                <!-- Theme Toggle -->
+                <button class="ctrl-btn theme-toggle" id="themeToggle" title="Toggle dark/light mode (T)">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                
+                <!-- GitHub Button -->
+                <a href="https://github.com/IROTECHLAB/IROSTREAM" target="_blank" class="ctrl-btn github-btn" title="View on GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                
+                <!-- Telegram Button -->
+                <a href="https://t.me/Irotech_lab" target="_blank" class="ctrl-btn telegram-btn" title="Join Telegram Channel">
+                    <i class="fab fa-telegram"></i>
+                </a>
+                
+                <!-- Shortcuts Button -->
+                <button class="ctrl-btn shortcuts-btn" id="shortcutsBtn" title="Keyboard Shortcuts (?)">
+                    <i class="fas fa-keyboard"></i>
+                </button>
+            </div>
+            
+            <div class="header-stats">
+                <div class="stat" id="bufferStat">
+                    <span class="stat-label">Buffer</span>
+                    <span class="stat-value" id="bufferPercent">0%</span>
+                </div>
+                <div class="stat" id="networkStat">
+                    <span class="stat-label">Speed</span>
+                    <span class="stat-value" id="networkSpeed">—</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- URL Input Section -->
+            <section class="url-section" id="urlSection">
+                <div class="url-container">
+                    <div class="open-source-badge">
+                        <i class="fab fa-osi"></i>
+                        <span>Open Source • MIT License</span>
+                    </div>
+                    
+                    <h1 class="title">IRO STREAM</h1>
+                    <p class="subtitle">High-performance video streaming with Netlify Functions backend</p>
+                    
+                    <div class="url-input-wrapper">
+                        <div class="url-input-bg"></div>
+                        <input 
+                            type="url" 
+                            id="videoUrl" 
+                            class="url-input" 
+                            placeholder="https://example.com/video.mp4"
+                            autocomplete="off"
+                            spellcheck="false"
+                            autofocus
+                        >
+                        <button class="play-btn" id="loadBtn">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M8 5.14v13.72a1 1 0 001.5.86l11-6.86a1 1 0 000-1.72l-11-6.86a1 1 0 00-1.5.86z" fill="currentColor"/>
+                            </svg>
+                            <span>Stream</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Proxy toggle -->
+                    <div class="proxy-option">
+                        <label class="proxy-toggle">
+                            <input type="checkbox" id="useProxy">
+                            <span class="proxy-slider"></span>
+                        </label>
+                        <span class="proxy-label">Use Netlify Functions Proxy (for CORS issues)</span>
+                    </div>
+                    
+                    <div class="supported-formats">
+                        <span class="format-tag">MP4</span>
+                        <span class="format-tag">WebM</span>
+                        <span class="format-tag">OGG</span>
+                        <span class="format-tag">HLS</span>
+                        <span class="format-tag">DASH</span>
+                        <span class="format-tag">MKV</span>
+                        <span class="format-tag">MOV</span>
+                    </div>
+                    
+                    <!-- Open Source Info -->
+                    <div class="open-source-info">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4>Open Source</h4>
+                                <p>IRO STREAM is completely open source under MIT License</p>
+                                <a href="https://github.com/IROTECHLAB/IROSTREAM" target="_blank" class="info-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    View on GitHub
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fab fa-telegram"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4>Community</h4>
+                                <p>Join our Telegram channel for updates and support</p>
+                                <a href="https://t.me/Irotech_lab" target="_blank" class="info-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    Join Telegram
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Features List -->
+                    <div class="features">
+                        <h3>Features</h3>
+                        <div class="features-grid">
+                            <div class="feature">
+                                <i class="fas fa-bolt"></i>
+                                <span>Fast Streaming</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Netlify Proxy</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-palette"></i>
+                                <span>Dark/Light Theme</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-keyboard"></i>
+                                <span>Keyboard Shortcuts</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Speed Control</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-cloud"></i>
+                                <span>Cloud Functions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Video Player Section -->
+            <section class="player-section" id="playerSection">
+                <div class="player-container" id="playerContainer">
+                    <!-- Network Slow Indicator -->
+                    <div class="network-slow-indicator" id="networkSlowIndicator">
+                        <div class="slow-indicator-content">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div class="slow-indicator-text">
+                                <span class="slow-title">Network Slow</span>
+                                <span class="slow-subtitle">Buffering chunk...</span>
+                            </div>
+                            <div class="slow-progress" id="slowProgress">
+                                <div class="slow-progress-fill" id="slowProgressFill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Element -->
+                    <video 
+                        id="videoPlayer" 
+                        class="video-element"
+                        preload="auto"
+                        playsinline
+                        crossorigin="anonymous"
+                    ></video>
+
+                    <!-- Buffer Indicator -->
+                    <div class="buffer-indicator" id="bufferIndicator">
+                        <div class="buffer-indicator-dot"></div>
+                        <span>Buffering ahead...</span>
+                    </div>
+
+                    <!-- Loading Overlay -->
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loader">
+                            <div class="loader-ring"></div>
+                            <div class="loader-ring"></div>
+                            <div class="loader-ring"></div>
+                        </div>
+                        <span class="loading-text" id="loadingText">Loading video...</span>
+                        <div class="loading-progress" id="loadingProgress">
+                            <div class="loading-progress-fill" id="loadingProgressFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Play Overlay -->
+                    <div class="play-overlay" id="playOverlay">
+                        <button class="big-play-btn" id="bigPlayBtn">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                                <path d="M26 20v24l20-12-20-12z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="controls" id="controls">
+                        <!-- Progress Bar -->
+                        <div class="progress-container" id="progressContainer">
+                            <div class="progress-buffer" id="progressBuffer"></div>
+                            <div class="progress-played" id="progressPlayed"></div>
+                            <div class="progress-thumb" id="progressThumb"></div>
+                            <div class="progress-tooltip" id="progressTooltip">0:00</div>
+                        </div>
+
+                        <!-- Controls Row -->
+                        <div class="controls-row">
+                            <div class="controls-left">
+                                <!-- Play/Pause -->
+                                <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause (Space)">
+                                    <svg class="icon-play" viewBox="0 0 24 24" fill="none">
+                                        <path d="M8 5.14v13.72a1 1 0 001.5.86l11-6.86a1 1 0 000-1.72l-11-6.86a1 1 0 00-1.5.86z" fill="currentColor"/>
+                                    </svg>
+                                    <svg class="icon-pause" viewBox="0 0 24 24" fill="none">
+                                        <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+                                        <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Skip Backward -->
+                                <button class="ctrl-btn" id="skipBackBtn" title="Back 10s (←)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M12.5 8V4L6 9l6.5 5v-4c3.5 0 6.5 2.9 6.5 6.5S16 23 12.5 23 6 20.1 6 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <text x="10" y="16" font-size="6" fill="currentColor" font-family="sans-serif">10</text>
+                                    </svg>
+                                </button>
+
+                                <!-- Skip Forward -->
+                                <button class="ctrl-btn" id="skipForwardBtn" title="Forward 10s (→)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M11.5 8V4L18 9l-6.5 5v-4C8 10 5 12.9 5 16.5S8 23 11.5 23 18 20.1 18 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <text x="9" y="16" font-size="6" fill="currentColor" font-family="sans-serif">10</text>
+                                    </svg>
+                                </button>
+
+                                <!-- Volume -->
+                                <div class="volume-container">
+                                    <button class="ctrl-btn" id="muteBtn" title="Mute (M)">
+                                        <svg class="icon-volume-high" viewBox="0 0 24 24" fill="none">
+                                            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+                                            <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        <svg class="icon-volume-low" viewBox="0 0 24 24" fill="none">
+                                            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+                                            <path d="M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                        <svg class="icon-volume-mute" viewBox="0 0 24 24" fill="none">
+                                            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+                                            <path d="M23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </button>
+                                    <div class="volume-slider-wrapper">
+                                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                                        <div class="volume-fill" id="volumeFill"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Time Display -->
+                                <div class="time-display" id="timeDisplay">
+                                    <span id="currentTime">0:00</span>
+                                    <span class="time-sep">/</span>
+                                    <span id="duration">0:00</span>
+                                </div>
+                                
+                                <!-- Time Input -->
+                                <div class="time-input-wrapper" id="timeInputWrapper" style="display: none;">
+                                    <input 
+                                        type="text" 
+                                        id="timeInput" 
+                                        class="time-input" 
+                                        placeholder="0:00:00"
+                                        pattern="[0-9:]*"
+                                    >
+                                    <button class="time-go-btn" id="timeGoBtn">Go</button>
+                                </div>
+                            </div>
+
+                            <div class="controls-right">
+                                <!-- Playback Speed -->
+                                <div class="speed-container">
+                                    <button class="ctrl-btn speed-btn" id="speedBtn" title="Playback Speed">
+                                        <span id="speedValue">1x</span>
+                                    </button>
+                                    <div class="speed-menu" id="speedMenu">
+                                        <div class="speed-presets">
+                                            <button class="speed-option" data-speed="0.25">0.25x</button>
+                                            <button class="speed-option" data-speed="0.5">0.5x</button>
+                                            <button class="speed-option" data-speed="0.75">0.75x</button>
+                                            <button class="speed-option active" data-speed="1">1x</button>
+                                            <button class="speed-option" data-speed="1.5">1.5x</button>
+                                            <button class="speed-option" data-speed="2">2x</button>
+                                            <button class="speed-option" data-speed="3">3x</button>
+                                            <button class="speed-option" data-speed="4">4x</button>
+                                            <button class="speed-option" data-speed="5">5x</button>
+                                            <button class="speed-option" data-speed="8">8x</button>
+                                            <button class="speed-option" data-speed="10">10x</button>
+                                            <button class="speed-option" data-speed="16">16x</button>
+                                            <button class="speed-option" data-speed="25">25x</button>
+                                            <button class="speed-option" data-speed="50">50x</button>
+                                            <button class="speed-option" data-speed="100">100x</button>
+                                        </div>
+                                        <div class="speed-custom">
+                                            <input type="number" id="customSpeedInput" class="custom-speed-input" placeholder="Custom" min="0.1" max="100" step="0.1">
+                                            <button class="custom-speed-btn" id="customSpeedBtn">Set</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Picture in Picture -->
+                                <button class="ctrl-btn" id="pipBtn" title="Picture in Picture (P)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                                        <rect x="11" y="10" width="9" height="6" rx="1" fill="currentColor"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Fullscreen -->
+                                <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen (F)">
+                                    <svg class="icon-expand" viewBox="0 0 24 24" fill="none">
+                                        <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <svg class="icon-compress" viewBox="0 0 24 24" fill="none">
+                                        <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Overlay -->
+                    <div class="error-overlay" id="errorOverlay">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2"/>
+                            <path d="M32 20v16M32 42v2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span class="error-text" id="errorText">Unable to load video</span>
+                        <button class="retry-btn" id="retryBtn">Try Again</button>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <button class="back-btn" id="backBtn">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>New Video</span>
+                </button>
+            </section>
+        </main>
+
+        <!-- Keyboard Shortcuts Modal -->
+        <div class="shortcuts-modal" id="shortcutsModal">
+            <div class="shortcuts-content">
+                <h3><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h3>
+                <div class="shortcuts-grid">
+                    <div class="shortcut"><kbd>Space</kbd><span>Play/Pause</span></div>
+                    <div class="shortcut"><kbd>F</kbd><span>Fullscreen</span></div>
+                    <div class="shortcut"><kbd>M</kbd><span>Mute</span></div>
+                    <div class="shortcut"><kbd>P</kbd><span>Picture in Picture</span></div>
+                    <div class="shortcut"><kbd>←</kbd><span>Back 10s</span></div>
+                    <div class="shortcut"><kbd>→</kbd><span>Forward 10s</span></div>
+                    <div class="shortcut"><kbd>↑</kbd><span>Volume Up</span></div>
+                    <div class="shortcut"><kbd>↓</kbd><span>Volume Down</span></div>
+                    <div class="shortcut"><kbd>0-9</kbd><span>Jump to 0%-90%</span></div>
+                    <div class="shortcut"><kbd>T</kbd><span>Toggle Theme</span></div>
+                    <div class="shortcut"><kbd>?</kbd><span>This Help</span></div>
+                    <div class="shortcut"><kbd>Esc</kbd><span>Close Modals</span></div>
+                </div>
+                <p style="text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-tertiary);">
+                    Click the time display to jump to a specific timestamp
+                </p>
+                <button class="close-shortcuts" id="closeShortcuts">Got it</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://github.com/IROTECHLAB/IROSTREAM" target="_blank" class="footer-link">
+                        <i class="fab fa-github"></i>
+                        GitHub
+                    </a>
+                    <a href="https://t.me/Irotech_lab" target="_blank" class="footer-link">
+                        <i class="fab fa-telegram"></i>
+                        Telegram
+                    </a>
+                    <a href="https://opensource.org/licenses/MIT" target="_blank" class="footer-link">
+                        <i class="fas fa-balance-scale"></i>
+                        MIT License
+                    </a>
+                    <button class="footer-link" id="shortcutsFooterBtn">
+                        <i class="fas fa-keyboard"></i>
+                        Shortcuts
+                    </button>
+                </div>
+                <div class="footer-copyright">
+                    <span>© 2026 IRO STREAM • Open Source Video Player</span>
+                    <span class="footer-version">v1.0.0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="player.js"></script>
+    <script src="theme.js"></script>
+    <script>
+        // Initialize shortcuts button
+        document.addEventListener('DOMContentLoaded', () => {
+            const shortcutsBtn = document.getElementById('shortcutsBtn');
+            const shortcutsFooterBtn = document.getElementById('shortcutsFooterBtn');
+            const shortcutsModal = document.getElementById('shortcutsModal');
+            const closeShortcuts = document.getElementById('closeShortcuts');
+            
+            function openShortcuts() {
+                shortcutsModal.classList.add('active');
+            }
+            
+            function closeShortcutsModal() {
+                shortcutsModal.classList.remove('active');
+            }
+            
+            if (shortcutsBtn) shortcutsBtn.addEventListener('click', openShortcuts);
+            if (shortcutsFooterBtn) shortcutsFooterBtn.addEventListener('click', openShortcuts);
+            if (closeShortcuts) closeShortcuts.addEventListener('click', closeShortcutsModal);
+            
+            // Close modal on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && shortcutsModal.classList.contains('active')) {
+                    closeShortcutsModal();
+                }
+                if (e.key === '?' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    openShortcuts();
+                }
+            });
+            
+            // Close modal on background click
+            shortcutsModal.addEventListener('click', (e) => {
+                if (e.target === shortcutsModal) {
+                    closeShortcutsModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
