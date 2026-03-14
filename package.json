@@ -1,0 +1,16 @@
+{
+    "name": "iro-stream",
+    "version": "1.0.0",
+    "description": "IRO STREAM - Video Player with Netlify Functions Backend",
+    "main": "index.html",
+    "scripts": {
+        "build": "echo 'Build complete'",
+        "dev": "netlify dev",
+        "test": "echo 'No tests specified'"
+    },
+    "keywords": ["video", "streaming", "player", "netlify"],
+    "author": "IRO Tech Lab",
+    "license": "MIT",
+    "devDependencies": {},
+    "dependencies": {}
+}
